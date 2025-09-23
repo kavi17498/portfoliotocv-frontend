@@ -82,19 +82,6 @@ function Page() {
             </div>
           </div>
         )}
-
-        {result && !result.error && (
-          <div className='mt-4 w-full max-w-2xl'>
-            <h3 className='text-lg font-semibold mb-2'>API Response:</h3>
-            <pre className='bg-gray-100 p-4 overflow-x-auto text-xs border rounded'>
-              {JSON.stringify(result, null, 2)}
-            </pre>
-            <div className='mt-2 text-sm text-gray-600'>
-              <p>Available keys: {Object.keys(result).join(', ')}</p>
-              <p>Has personal_information: {result.parsed_data?.personal_information ? 'Yes' : 'No'}</p>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className='flex flex-col items-center justify-center py-2'>
