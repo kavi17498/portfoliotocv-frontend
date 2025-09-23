@@ -9,19 +9,23 @@ function Page() {
   
   // State for dynamic form management
   const [personalInfo, setPersonalInfo] = useState<{[key: string]: string}>({})
+  const [professionalSummary, setProfessionalSummary] = useState<string>('')
   const [skills, setSkills] = useState<string[]>([])
   const [projects, setProjects] = useState<any[]>([])
   const [languages, setLanguages] = useState<string[]>([])
   const [education, setEducation] = useState<any[]>([])
+  const [workExperience, setWorkExperience] = useState<any[]>([])
 
   // Initialize form data when result changes
   React.useEffect(() => {
     if (result?.parsed_data) {
       setPersonalInfo(result.parsed_data.personal_information || {})
+      setProfessionalSummary(result.parsed_data.professional_summary || '')
       setSkills(result.parsed_data.skills || [])
       setProjects(result.parsed_data.projects || [])
       setLanguages(result.parsed_data.languages || [])
       setEducation(result.parsed_data.education || [])
+      setWorkExperience(result.parsed_data.work_experience || [])
     }
   }, [result])
 
@@ -45,6 +49,90 @@ function Page() {
     } catch (error) {
       console.error('Fetch error:', error)
       setResult({ error: 'Failed to fetch data. Please check the URL and try again.' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGeneratePDF = async () => {
+    try {
+      setLoading(true)
+      
+      // Prepare the CV data in the required format
+      const cvData = {
+        personal_information: personalInfo,
+        professional_summary: professionalSummary,
+        skills: skills.filter(skill => skill.trim() !== ''),
+        projects: projects.filter(project => 
+          project.name && project.name.trim() !== ''
+        ).map(project => ({
+          name: project.name,
+          description: project.description || '',
+          technologies: Array.isArray(project.technologies) 
+            ? project.technologies.filter((tech: any) => tech && tech.trim() !== '')
+            : project.technologies?.split(', ').filter((tech: any) => tech && tech.trim() !== '') || [],
+          link: project.link || ''
+        })),
+        work_experience: workExperience.filter(work => 
+          work.position && work.position.trim() !== ''
+        ).map(work => ({
+          position: work.position,
+          company: work.company || '',
+          duration: work.duration || `${work.start_date || ''} - ${work.end_date || ''}`,
+          start_date: work.start_date || '',
+          end_date: work.end_date || '',
+          responsibilities: work.responsibilities || [work.description || ''].filter(r => r.trim() !== ''),
+          description: work.description || ''
+        })),
+        education: education.filter(edu => 
+          edu.degree && edu.degree.trim() !== ''
+        ).map(edu => ({
+          degree: edu.degree,
+          institution: edu.institution || '',
+          graduation_year: edu.graduation_year || '',
+          gpa: edu.gpa || ''
+        })),
+        languages: languages.filter(lang => lang.trim() !== '')
+      }
+
+      // Generate filename from personal info
+      const name = personalInfo.name || personalInfo.Name || 'CV'
+      const filename = name.replace(/[^a-zA-Z0-9]/g, '_') + '_Resume'
+
+      const requestBody = {
+        cv_data: cvData,
+        filename: filename
+      }
+
+      console.log('Sending CV data:', requestBody)
+
+      const response = await fetch('http://127.0.0.1:8000/generate-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      // Handle PDF response
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${filename}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      console.log('PDF generated successfully!')
+    } catch (error) {
+      console.error('PDF generation error:', error)
+      alert('Failed to generate PDF. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -146,7 +234,8 @@ function Page() {
           <h2 className="text-xl font-semibold mt-6">Professional Summary</h2>
           <textarea
             className="border p-2 w-full my-2 h-24"
-            defaultValue={result.parsed_data.professional_summary || ''}
+            value={professionalSummary}
+            onChange={(e) => setProfessionalSummary(e.target.value)}
             placeholder="Professional summary..."
           />
 
@@ -188,42 +277,79 @@ function Page() {
           </div>
 
           {/* Education */}
-          {result.parsed_data.education && Array.isArray(result.parsed_data.education) && (
-            <>
-              <h2 className="text-xl font-semibold mt-6">Education</h2>
-              {result.parsed_data.education.map((edu: any, index: number) => (
-                <div key={index} className="border p-4 my-2 rounded bg-gray-50">
-                  <h3 className="font-medium mb-2">Education {index + 1}</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      className="border p-2 w-full my-1"
-                      defaultValue={edu?.degree || ''}
-                      placeholder="Degree"
-                    />
-                    <input
-                      type="text"
-                      className="border p-2 w-full my-1"
-                      defaultValue={edu?.institution || ''}
-                      placeholder="Institution"
-                    />
-                    <input
-                      type="text"
-                      className="border p-2 w-full my-1"
-                      defaultValue={edu?.graduation_year || ''}
-                      placeholder="Graduation Year"
-                    />
-                    <input
-                      type="text"
-                      className="border p-2 w-full my-1"
-                      defaultValue={edu?.gpa || ''}
-                      placeholder="GPA"
-                    />
-                  </div>
+          <h2 className="text-xl font-semibold mt-6">Education</h2>
+          <div className="space-y-4">
+            {education.map((edu, index) => (
+              <div key={index} className="border p-4 rounded bg-gray-50">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-medium">Education {index + 1}</h3>
+                  <button
+                    type="button"
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    onClick={() => {
+                      const newEducation = education.filter((_, i) => i !== index)
+                      setEducation(newEducation)
+                    }}
+                  >
+                    ✕
+                  </button>
                 </div>
-              ))}
-            </>
-          )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    className="border p-2 w-full my-1"
+                    value={edu?.degree || ''}
+                    onChange={(e) => {
+                      const newEducation = [...education]
+                      newEducation[index] = { ...newEducation[index], degree: e.target.value }
+                      setEducation(newEducation)
+                    }}
+                    placeholder="Degree"
+                  />
+                  <input
+                    type="text"
+                    className="border p-2 w-full my-1"
+                    value={edu?.institution || ''}
+                    onChange={(e) => {
+                      const newEducation = [...education]
+                      newEducation[index] = { ...newEducation[index], institution: e.target.value }
+                      setEducation(newEducation)
+                    }}
+                    placeholder="Institution"
+                  />
+                  <input
+                    type="text"
+                    className="border p-2 w-full my-1"
+                    value={edu?.graduation_year || ''}
+                    onChange={(e) => {
+                      const newEducation = [...education]
+                      newEducation[index] = { ...newEducation[index], graduation_year: e.target.value }
+                      setEducation(newEducation)
+                    }}
+                    placeholder="Graduation Year"
+                  />
+                  <input
+                    type="text"
+                    className="border p-2 w-full my-1"
+                    value={edu?.gpa || ''}
+                    onChange={(e) => {
+                      const newEducation = [...education]
+                      newEducation[index] = { ...newEducation[index], gpa: e.target.value }
+                      setEducation(newEducation)
+                    }}
+                    placeholder="GPA"
+                  />
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              onClick={() => setEducation([...education, { degree: '', institution: '', graduation_year: '', gpa: '' }])}
+            >
+              + Add Education
+            </button>
+          </div>
 
           {/* Projects */}
           <h2 className="text-xl font-semibold mt-6">Projects</h2>
@@ -337,52 +463,98 @@ function Page() {
           </div>
 
           {/* Work Experience */}
-          {result.parsed_data.work_experience && Array.isArray(result.parsed_data.work_experience) && result.parsed_data.work_experience.length > 0 && (
-            <>
-              <h2 className="text-xl font-semibold mt-6">Work Experience</h2>
-              {result.parsed_data.work_experience.map((work: any, index: number) => (
-                <div key={index} className="border p-4 my-2 rounded bg-gray-50">
-                  <h3 className="font-medium mb-2">Experience {index + 1}</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      className="border p-2 w-full my-1"
-                      defaultValue={work?.position || ''}
-                      placeholder="Position"
-                    />
-                    <input
-                      type="text"
-                      className="border p-2 w-full my-1"
-                      defaultValue={work?.company || ''}
-                      placeholder="Company"
-                    />
-                    <input
-                      type="text"
-                      className="border p-2 w-full my-1"
-                      defaultValue={work?.start_date || ''}
-                      placeholder="Start Date"
-                    />
-                    <input
-                      type="text"
-                      className="border p-2 w-full my-1"
-                      defaultValue={work?.end_date || ''}
-                      placeholder="End Date"
-                    />
-                  </div>
-                  <textarea
-                    className="border p-2 w-full my-1 h-16"
-                    defaultValue={work?.description || ''}
-                    placeholder="Job Description"
+          <h2 className="text-xl font-semibold mt-6">Work Experience</h2>
+          <div className="space-y-4">
+            {workExperience.map((work, index) => (
+              <div key={index} className="border p-4 rounded bg-gray-50">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-medium">Experience {index + 1}</h3>
+                  <button
+                    type="button"
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    onClick={() => {
+                      const newWorkExperience = workExperience.filter((_, i) => i !== index)
+                      setWorkExperience(newWorkExperience)
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    className="border p-2 w-full my-1"
+                    value={work?.position || ''}
+                    onChange={(e) => {
+                      const newWorkExperience = [...workExperience]
+                      newWorkExperience[index] = { ...newWorkExperience[index], position: e.target.value }
+                      setWorkExperience(newWorkExperience)
+                    }}
+                    placeholder="Position"
+                  />
+                  <input
+                    type="text"
+                    className="border p-2 w-full my-1"
+                    value={work?.company || ''}
+                    onChange={(e) => {
+                      const newWorkExperience = [...workExperience]
+                      newWorkExperience[index] = { ...newWorkExperience[index], company: e.target.value }
+                      setWorkExperience(newWorkExperience)
+                    }}
+                    placeholder="Company"
+                  />
+                  <input
+                    type="text"
+                    className="border p-2 w-full my-1"
+                    value={work?.start_date || ''}
+                    onChange={(e) => {
+                      const newWorkExperience = [...workExperience]
+                      newWorkExperience[index] = { ...newWorkExperience[index], start_date: e.target.value }
+                      setWorkExperience(newWorkExperience)
+                    }}
+                    placeholder="Start Date"
+                  />
+                  <input
+                    type="text"
+                    className="border p-2 w-full my-1"
+                    value={work?.end_date || ''}
+                    onChange={(e) => {
+                      const newWorkExperience = [...workExperience]
+                      newWorkExperience[index] = { ...newWorkExperience[index], end_date: e.target.value }
+                      setWorkExperience(newWorkExperience)
+                    }}
+                    placeholder="End Date"
                   />
                 </div>
-              ))}
-            </>
-          )}
+                <textarea
+                  className="border p-2 w-full my-1 h-16"
+                  value={work?.description || ''}
+                  onChange={(e) => {
+                    const newWorkExperience = [...workExperience]
+                    newWorkExperience[index] = { ...newWorkExperience[index], description: e.target.value }
+                    setWorkExperience(newWorkExperience)
+                  }}
+                  placeholder="Job Description"
+                />
+              </div>
+            ))}
+            <button
+              type="button"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              onClick={() => setWorkExperience([...workExperience, { position: '', company: '', start_date: '', end_date: '', description: '' }])}
+            >
+              + Add Work Experience
+            </button>
+          </div>
 
           {/* Save Button */}
           <div className="mt-8 flex justify-center">
-            <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold">
-              Generate PDF CV
+            <button 
+              className={`text-white px-8 py-3 rounded-lg font-semibold ${loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
+              onClick={handleGeneratePDF}
+              disabled={loading}
+            >
+              {loading ? 'Generating PDF...' : 'Generate PDF CV'}
             </button>
           </div>
         </div>
