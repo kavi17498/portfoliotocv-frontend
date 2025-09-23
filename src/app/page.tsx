@@ -15,6 +15,7 @@ function Page() {
   const [languages, setLanguages] = useState<string[]>([])
   const [education, setEducation] = useState<any[]>([])
   const [workExperience, setWorkExperience] = useState<any[]>([])
+  const [pdfUrl, setPdfUrl] = useState<string>('')
 
   // Initialize form data when result changes
   React.useEffect(() => {
@@ -118,16 +119,10 @@ function Page() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      // Handle PDF response
+      // Handle PDF response - Show in iframe instead of downloading
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${filename}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      setPdfUrl(url)
 
       console.log('PDF generated successfully!')
     } catch (error) {
@@ -179,8 +174,44 @@ function Page() {
 
       {/* Show CV editor if result exists and has data - more flexible condition */}
       {result && !result.error && result.parsed_data && (
-        <div className="p-6 max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold mb-4">Edit CV</h1>
+        <div className="flex max-w-7xl mx-auto p-6 gap-6">
+          {/* PDF Preview - Left Side */}
+          <div className="w-1/2">
+            <div className="sticky top-6">
+              <h2 className="text-xl font-semibold mb-4">PDF Preview</h2>
+              {pdfUrl ? (
+                <div className="border rounded-lg overflow-hidden">
+                  <iframe
+                    src={pdfUrl}
+                    width="100%"
+                    height="800px"
+                    className="border-0"
+                    title="CV Preview"
+                  />
+                  <div className="p-2 bg-gray-50 border-t">
+                    <a
+                      href={pdfUrl}
+                      download={`${(personalInfo.name || personalInfo.Name || 'CV').replace(/[^a-zA-Z0-9]/g, '_')}_Resume.pdf`}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm inline-flex items-center"
+                    >
+                      📥 Download PDF
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg h-96 flex items-center justify-center text-gray-500">
+                  <div className="text-center">
+                    <div className="text-4xl mb-2">📄</div>
+                    <p>Click "Generate PDF CV" to see preview</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* CV Editor - Right Side */}
+          <div className="w-1/2">
+            <h1 className="text-2xl font-bold mb-4">Edit CV</h1>
 
           {/* Personal Information */}
           <h2 className="text-xl font-semibold">Personal Information</h2>
@@ -556,6 +587,7 @@ function Page() {
             >
               {loading ? 'Generating PDF...' : 'Generate PDF CV'}
             </button>
+          </div>
           </div>
         </div>
       )}
