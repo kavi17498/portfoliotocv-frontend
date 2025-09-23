@@ -167,10 +167,12 @@ function Page() {
         )}
       </div>
 
-      <div className='flex flex-col items-center justify-center py-2'>
-        <h1 className='text-4xl font-bold'>Convert Your Portfolio Website to CV</h1>
-        <p className='mt-4 text-lg'>Developed by Kcodz</p>
-      </div>
+      {!result?.parsed_data && (
+        <div className='flex flex-col items-center justify-center py-2'>
+          <h1 className='text-4xl font-bold'>Convert Your Portfolio Website to CV</h1>
+          <p className='mt-4 text-lg'>Developed by Kcodz</p>
+        </div>
+      )}
 
       {/* Show CV editor if result exists and has data - more flexible condition */}
       {result && !result.error && result.parsed_data && (
