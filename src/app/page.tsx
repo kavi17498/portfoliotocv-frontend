@@ -134,462 +134,581 @@ function Page() {
   }
 
   return (
-    <main>
-      <nav className='bg-gray-800 text-white p-4'>
-        <h1 className='text-lg font-bold'>Portfolio to CV</h1>
+    <main className="min-h-screen bg-blue-50">
+      {/* Modern Header */}
+      <nav className='bg-blue-600 text-white p-6 shadow-lg'>
+        <div className="max-w-7xl mx-auto">
+          <h1 className='text-2xl font-bold tracking-wide'>🚀 Portfolio to CV</h1>
+        </div>
       </nav>
 
-      <div className='flex flex-col items-center justify-center py-4 m-10'>
-        <div className='flex flex-row w-full max-w-2xl'>
-          <textarea
-            className='border border-gray-300 w-full resize-none p-4 h-20'
-            rows={4}
-            placeholder='Enter your portfolio link here...'
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={loading}
-          ></textarea>
-          <button 
-            className={`text-white p-4 ml-2 h-fit self-start ${loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
-            onClick={handleButtonClick}
-            disabled={loading}
-          >
-            {loading ? 'Generating...' : 'Generate CV'}
-          </button>
+      {/* Hero Section with Input */}
+      <div className='flex flex-col items-center justify-center py-12 px-6'>
+        <div className='w-full max-w-4xl'>
+          {/* Animated Card Container */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 transition-all duration-300 hover:shadow-2xl">
+            <div className='flex flex-col lg:flex-row gap-4 items-end'>
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Portfolio Website URL
+                </label>
+                <textarea
+                  className='w-full resize-none p-4 rounded-xl border-2 border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-gray-700 placeholder-gray-400 shadow-sm'
+                  rows={3}
+                  placeholder='Enter your portfolio website URL (e.g., yourname.com, github.io/portfolio)'
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+              <button 
+                className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg min-w-[160px] ${
+                  loading 
+                    ? 'bg-gray-400 cursor-not-allowed text-white' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-xl'
+                }`}
+                onClick={handleButtonClick}
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Analyzing...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    ✨ Generate CV
+                  </div>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
         
+        {/* Error Message with Modern Styling */}
         {result && result.error && (
-          <div className='mt-4 w-full max-w-2xl'>
-            <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
-              {result.error}
+          <div className='mt-6 w-full max-w-4xl'>
+            <div className='bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl flex items-center gap-3 shadow-sm'>
+              <div className="text-red-500">❌</div>
+              <div>{result.error}</div>
             </div>
           </div>
         )}
       </div>
 
+      {/* Hero Text Section */}
       {!result?.parsed_data && (
-        <div className='flex flex-col items-center justify-center py-2'>
-          <h1 className='text-4xl font-bold'>Convert Your Portfolio Website to CV</h1>
-          <p className='mt-4 text-lg'>Developed by Kcodz</p>
+        <div className='flex flex-col items-center justify-center py-16 px-6'>
+          <div className="text-center max-w-3xl">
+            <h1 className='text-5xl lg:text-6xl font-bold text-blue-600 mb-6'>
+              Convert Your Portfolio to Professional CV
+            </h1>
+            <p className='text-xl text-gray-600 mb-8 leading-relaxed'>
+              Transform your online portfolio into a stunning, ATS-friendly CV in seconds. 
+              <br />Powered by AI technology for the modern job market.
+            </p>
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                AI-Powered Analysis
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Professional Templates
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                ATS-Friendly Format
+              </div>
+            </div>
+            <div className="mt-12 text-center">
+              <p className='text-gray-500'>Developed with ❤️ by <span className="font-semibold text-blue-600">Kcodz</span></p>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Show CV editor if result exists and has data - more flexible condition */}
+      {/* Modern Split Layout */}
       {result && !result.error && result.parsed_data && (
-        <div className="flex max-w-7xl mx-auto p-6 gap-6">
-          {/* PDF Preview - Left Side */}
-          <div className="w-1/2">
-            <div className="sticky top-6">
-              <h2 className="text-xl font-semibold mb-4">PDF Preview</h2>
-              {pdfUrl ? (
-                <div className="border rounded-lg overflow-hidden">
-                  <iframe
-                    src={pdfUrl}
-                    width="100%"
-                    height="800px"
-                    className="border-0"
-                    title="CV Preview"
-                  />
-                  <div className="p-2 bg-gray-50 border-t">
-                    <a
-                      href={pdfUrl}
-                      download={`${(personalInfo.name || personalInfo.Name || 'CV').replace(/[^a-zA-Z0-9]/g, '_')}_Resume.pdf`}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm inline-flex items-center"
-                    >
-                      📥 Download PDF
-                    </a>
+        <div className="max-w-7xl mx-auto p-6">
+          <div className="flex flex-col xl:flex-row gap-8">
+            {/* PDF Preview - Left Side */}
+            <div className="xl:w-1/2">
+              <div className="sticky top-6">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+                  <div className="bg-blue-600 text-white p-4">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                      📄 PDF Preview
+                    </h2>
                   </div>
+                  
+                  {pdfUrl ? (
+                    <>
+                      <iframe
+                        src={pdfUrl}
+                        width="100%"
+                        height="700px"
+                        className="border-0"
+                        title="CV Preview"
+                      />
+                      <div className="p-4 bg-gray-50 border-t">
+                        <a
+                          href={pdfUrl}
+                          download={`${(personalInfo.name || personalInfo.Name || 'CV').replace(/[^a-zA-Z0-9]/g, '_')}_Resume.pdf`}
+                          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                        >
+                          📥 Download PDF
+                        </a>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="h-96 flex items-center justify-center text-gray-400">
+                      <div className="text-center">
+                        <div className="text-6xl mb-4">📄</div>
+                        <p className="text-lg">Click "Generate PDF CV" to see preview</p>
+                        <div className="mt-4 text-sm text-gray-500">
+                          Your CV will appear here in real-time
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg h-96 flex items-center justify-center text-gray-500">
-                  <div className="text-center">
-                    <div className="text-4xl mb-2">📄</div>
-                    <p>Click "Generate PDF CV" to see preview</p>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
-          </div>
 
-          {/* CV Editor - Right Side */}
-          <div className="w-1/2">
-            <h1 className="text-2xl font-bold mb-4">Edit CV</h1>
-
-          {/* Personal Information */}
-          <h2 className="text-xl font-semibold">Personal Information</h2>
-          <div className="space-y-2">
-            {Object.entries(personalInfo).map(([key, value], index) => (
-              <div key={index} className="flex gap-2">
-                <input
-                  type="text"
-                  className="border p-2 flex-1"
-                  value={key}
-                  onChange={(e) => {
-                    const newPersonalInfo = { ...personalInfo }
-                    delete newPersonalInfo[key]
-                    newPersonalInfo[e.target.value] = value
-                    setPersonalInfo(newPersonalInfo)
-                  }}
-                  placeholder="Field name (e.g., name, email)"
-                />
-                <input
-                  type="text"
-                  className="border p-2 flex-1"
-                  value={value}
-                  onChange={(e) => {
-                    setPersonalInfo({ ...personalInfo, [key]: e.target.value })
-                  }}
-                  placeholder="Value"
-                />
-                <button
-                  type="button"
-                  className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
-                  onClick={() => {
-                    const newPersonalInfo = { ...personalInfo }
-                    delete newPersonalInfo[key]
-                    setPersonalInfo(newPersonalInfo)
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => setPersonalInfo({ ...personalInfo, '': '' })}
-            >
-              + Add Personal Info
-            </button>
-          </div>
-
-          {/* Professional Summary */}
-          <h2 className="text-xl font-semibold mt-6">Professional Summary</h2>
-          <textarea
-            className="border p-2 w-full my-2 h-24"
-            value={professionalSummary}
-            onChange={(e) => setProfessionalSummary(e.target.value)}
-            placeholder="Professional summary..."
-          />
-
-          {/* Skills */}
-          <h2 className="text-xl font-semibold mt-6">Skills</h2>
-          <div className="space-y-2">
-            {skills.map((skill, index) => (
-              <div key={index} className="flex gap-2">
-                <input
-                  type="text"
-                  className="border p-2 flex-1"
-                  value={skill}
-                  onChange={(e) => {
-                    const newSkills = [...skills]
-                    newSkills[index] = e.target.value
-                    setSkills(newSkills)
-                  }}
-                  placeholder={`Skill ${index + 1}`}
-                />
-                <button
-                  type="button"
-                  className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
-                  onClick={() => {
-                    const newSkills = skills.filter((_, i) => i !== index)
-                    setSkills(newSkills)
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => setSkills([...skills, ''])}
-            >
-              + Add Skill
-            </button>
-          </div>
-
-          {/* Education */}
-          <h2 className="text-xl font-semibold mt-6">Education</h2>
-          <div className="space-y-4">
-            {education.map((edu, index) => (
-              <div key={index} className="border p-4 rounded bg-gray-50">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-medium">Education {index + 1}</h3>
-                  <button
-                    type="button"
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    onClick={() => {
-                      const newEducation = education.filter((_, i) => i !== index)
-                      setEducation(newEducation)
-                    }}
-                  >
-                    ✕
-                  </button>
+            {/* CV Editor - Right Side */}
+            <div className="xl:w-1/2">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+                <div className="bg-blue-600 text-white p-4 -m-6 mb-6 rounded-t-2xl">
+                  <h1 className="text-2xl font-bold flex items-center gap-2">
+                    ✏️ Edit CV Data
+                  </h1>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <input
-                    type="text"
-                    className="border p-2 w-full my-1"
-                    value={edu?.degree || ''}
-                    onChange={(e) => {
-                      const newEducation = [...education]
-                      newEducation[index] = { ...newEducation[index], degree: e.target.value }
-                      setEducation(newEducation)
-                    }}
-                    placeholder="Degree"
-                  />
-                  <input
-                    type="text"
-                    className="border p-2 w-full my-1"
-                    value={edu?.institution || ''}
-                    onChange={(e) => {
-                      const newEducation = [...education]
-                      newEducation[index] = { ...newEducation[index], institution: e.target.value }
-                      setEducation(newEducation)
-                    }}
-                    placeholder="Institution"
-                  />
-                  <input
-                    type="text"
-                    className="border p-2 w-full my-1"
-                    value={edu?.graduation_year || ''}
-                    onChange={(e) => {
-                      const newEducation = [...education]
-                      newEducation[index] = { ...newEducation[index], graduation_year: e.target.value }
-                      setEducation(newEducation)
-                    }}
-                    placeholder="Graduation Year"
-                  />
-                  <input
-                    type="text"
-                    className="border p-2 w-full my-1"
-                    value={edu?.gpa || ''}
-                    onChange={(e) => {
-                      const newEducation = [...education]
-                      newEducation[index] = { ...newEducation[index], gpa: e.target.value }
-                      setEducation(newEducation)
-                    }}
-                    placeholder="GPA"
-                  />
-                </div>
-              </div>
-            ))}
-            <button
-              type="button"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => setEducation([...education, { degree: '', institution: '', graduation_year: '', gpa: '' }])}
-            >
-              + Add Education
-            </button>
-          </div>
 
-          {/* Projects */}
-          <h2 className="text-xl font-semibold mt-6">Projects</h2>
-          <div className="space-y-4">
-            {projects.map((project, index) => (
-              <div key={index} className="border p-4 rounded bg-gray-50">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-medium">Project {index + 1}</h3>
-                  <button
-                    type="button"
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    onClick={() => {
-                      const newProjects = projects.filter((_, i) => i !== index)
-                      setProjects(newProjects)
-                    }}
-                  >
-                    ✕
-                  </button>
+                <div className="space-y-8 max-h-[800px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-gray-100">
+
+                {/* Personal Information Section */}
+                <div className="space-y-4">
+                  <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    👤 Personal Information
+                  </h2>
+                  <div className="space-y-3">
+                    {Object.entries(personalInfo).map(([key, value], index) => (
+                      <div key={index} className="flex gap-3 p-3 bg-blue-50/50 rounded-xl border border-blue-100">
+                        <input
+                          type="text"
+                          className="flex-1 p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                          value={key}
+                          onChange={(e) => {
+                            const newPersonalInfo = { ...personalInfo }
+                            delete newPersonalInfo[key]
+                            newPersonalInfo[e.target.value] = value
+                            setPersonalInfo(newPersonalInfo)
+                          }}
+                          placeholder="Field name (e.g., name, email)"
+                        />
+                        <input
+                          type="text"
+                          className="flex-1 p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                          value={value}
+                          onChange={(e) => {
+                            setPersonalInfo({ ...personalInfo, [key]: e.target.value })
+                          }}
+                          placeholder="Value"
+                        />
+                        <button
+                          type="button"
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-all duration-200 transform hover:scale-105"
+                          onClick={() => {
+                            const newPersonalInfo = { ...personalInfo }
+                            delete newPersonalInfo[key]
+                            setPersonalInfo(newPersonalInfo)
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                      onClick={() => setPersonalInfo({ ...personalInfo, '': '' })}
+                    >
+                      + Add Personal Info
+                    </button>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    className="border p-2 w-full"
-                    value={project.name || ''}
-                    onChange={(e) => {
-                      const newProjects = [...projects]
-                      newProjects[index] = { ...newProjects[index], name: e.target.value }
-                      setProjects(newProjects)
-                    }}
-                    placeholder="Project Name"
-                  />
+
+                {/* Professional Summary Section */}
+                <div className="space-y-4">
+                  <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    📝 Professional Summary
+                  </h2>
                   <textarea
-                    className="border p-2 w-full h-16"
-                    value={project.description || ''}
-                    onChange={(e) => {
-                      const newProjects = [...projects]
-                      newProjects[index] = { ...newProjects[index], description: e.target.value }
-                      setProjects(newProjects)
-                    }}
-                    placeholder="Project Description"
-                  />
-                  <input
-                    type="text"
-                    className="border p-2 w-full"
-                    value={Array.isArray(project.technologies) ? project.technologies.join(', ') : project.technologies || ''}
-                    onChange={(e) => {
-                      const newProjects = [...projects]
-                      newProjects[index] = { ...newProjects[index], technologies: e.target.value.split(', ') }
-                      setProjects(newProjects)
-                    }}
-                    placeholder="Technologies (comma separated)"
-                  />
-                  <input
-                    type="text"
-                    className="border p-2 w-full"
-                    value={project.link || ''}
-                    onChange={(e) => {
-                      const newProjects = [...projects]
-                      newProjects[index] = { ...newProjects[index], link: e.target.value }
-                      setProjects(newProjects)
-                    }}
-                    placeholder="Project Link"
+                    className="w-full p-4 h-32 rounded-xl border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 resize-none shadow-sm hover:shadow-md"
+                    value={professionalSummary}
+                    onChange={(e) => setProfessionalSummary(e.target.value)}
+                    placeholder="Write a compelling professional summary that highlights your expertise and career goals..."
                   />
                 </div>
-              </div>
-            ))}
-            <button
-              type="button"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => setProjects([...projects, { name: '', description: '', technologies: [], link: '' }])}
-            >
-              + Add Project
-            </button>
-          </div>
 
-          {/* Languages */}
-          <h2 className="text-xl font-semibold mt-6">Languages</h2>
-          <div className="space-y-2">
-            {languages.map((language, index) => (
-              <div key={index} className="flex gap-2">
-                <input
-                  type="text"
-                  className="border p-2 flex-1"
-                  value={language}
-                  onChange={(e) => {
-                    const newLanguages = [...languages]
-                    newLanguages[index] = e.target.value
-                    setLanguages(newLanguages)
-                  }}
-                  placeholder={`Language ${index + 1}`}
-                />
-                <button
-                  type="button"
-                  className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
-                  onClick={() => {
-                    const newLanguages = languages.filter((_, i) => i !== index)
-                    setLanguages(newLanguages)
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => setLanguages([...languages, ''])}
-            >
-              + Add Language
-            </button>
-          </div>
+                {/* Skills Section */}
+                <div className="space-y-4">
+                  <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    🚀 Skills
+                  </h2>
+                  <div className="space-y-3">
+                    {skills.map((skill, index) => (
+                      <div key={index} className="flex gap-3 p-3 bg-green-50/50 rounded-xl border border-green-100">
+                        <input
+                          type="text"
+                          className="flex-1 p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                          value={skill}
+                          onChange={(e) => {
+                            const newSkills = [...skills]
+                            newSkills[index] = e.target.value
+                            setSkills(newSkills)
+                          }}
+                          placeholder={`Skill ${index + 1}`}
+                        />
+                        <button
+                          type="button"
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-all duration-200 transform hover:scale-105"
+                          onClick={() => {
+                            const newSkills = skills.filter((_, i) => i !== index)
+                            setSkills(newSkills)
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                      onClick={() => setSkills([...skills, ''])}
+                    >
+                      + Add Skill
+                    </button>
+                  </div>
+                </div>
 
-          {/* Work Experience */}
-          <h2 className="text-xl font-semibold mt-6">Work Experience</h2>
-          <div className="space-y-4">
-            {workExperience.map((work, index) => (
-              <div key={index} className="border p-4 rounded bg-gray-50">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-medium">Experience {index + 1}</h3>
-                  <button
-                    type="button"
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    onClick={() => {
-                      const newWorkExperience = workExperience.filter((_, i) => i !== index)
-                      setWorkExperience(newWorkExperience)
-                    }}
+                {/* Education Section */}
+                <div className="space-y-4">
+                  <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    🎓 Education
+                  </h2>
+                  <div className="space-y-4">
+                    {education.map((edu, index) => (
+                      <div key={index} className="p-4 bg-blue-50/30 rounded-xl border border-blue-100">
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="font-semibold text-gray-700">Education {index + 1}</h3>
+                          <button
+                            type="button"
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-all duration-200 transform hover:scale-105"
+                            onClick={() => {
+                              const newEducation = education.filter((_, i) => i !== index)
+                              setEducation(newEducation)
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <input
+                            type="text"
+                            className="p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                            value={edu?.degree || ''}
+                            onChange={(e) => {
+                              const newEducation = [...education]
+                              newEducation[index] = { ...newEducation[index], degree: e.target.value }
+                              setEducation(newEducation)
+                            }}
+                            placeholder="Degree"
+                          />
+                          <input
+                            type="text"
+                            className="p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                            value={edu?.institution || ''}
+                            onChange={(e) => {
+                              const newEducation = [...education]
+                              newEducation[index] = { ...newEducation[index], institution: e.target.value }
+                              setEducation(newEducation)
+                            }}
+                            placeholder="Institution"
+                          />
+                          <input
+                            type="text"
+                            className="p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                            value={edu?.graduation_year || ''}
+                            onChange={(e) => {
+                              const newEducation = [...education]
+                              newEducation[index] = { ...newEducation[index], graduation_year: e.target.value }
+                              setEducation(newEducation)
+                            }}
+                            placeholder="Graduation Year"
+                          />
+                          <input
+                            type="text"
+                            className="p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                            value={edu?.gpa || ''}
+                            onChange={(e) => {
+                              const newEducation = [...education]
+                              newEducation[index] = { ...newEducation[index], gpa: e.target.value }
+                              setEducation(newEducation)
+                            }}
+                            placeholder="GPA"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                      onClick={() => setEducation([...education, { degree: '', institution: '', graduation_year: '', gpa: '' }])}
+                    >
+                      + Add Education
+                    </button>
+                  </div>
+                </div>
+
+                {/* Projects Section */}
+                <div className="space-y-4">
+                  <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    💼 Projects
+                  </h2>
+                  <div className="space-y-4">
+                    {projects.map((project, index) => (
+                      <div key={index} className="p-4 bg-green-50/30 rounded-xl border border-green-100">
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="font-semibold text-gray-700">Project {index + 1}</h3>
+                          <button
+                            type="button"
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-all duration-200 transform hover:scale-105"
+                            onClick={() => {
+                              const newProjects = projects.filter((_, i) => i !== index)
+                              setProjects(newProjects)
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <div className="space-y-3">
+                          <input
+                            type="text"
+                            className="w-full p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                            value={project.name || ''}
+                            onChange={(e) => {
+                              const newProjects = [...projects]
+                              newProjects[index] = { ...newProjects[index], name: e.target.value }
+                              setProjects(newProjects)
+                            }}
+                            placeholder="Project Name"
+                          />
+                          <textarea
+                            className="w-full p-3 h-20 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 resize-none shadow-sm hover:shadow-md"
+                            value={project.description || ''}
+                            onChange={(e) => {
+                              const newProjects = [...projects]
+                              newProjects[index] = { ...newProjects[index], description: e.target.value }
+                              setProjects(newProjects)
+                            }}
+                            placeholder="Project Description"
+                          />
+                          <input
+                            type="text"
+                            className="w-full p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                            value={Array.isArray(project.technologies) ? project.technologies.join(', ') : project.technologies || ''}
+                            onChange={(e) => {
+                              const newProjects = [...projects]
+                              newProjects[index] = { ...newProjects[index], technologies: e.target.value.split(', ') }
+                              setProjects(newProjects)
+                            }}
+                            placeholder="Technologies (comma separated)"
+                          />
+                          <input
+                            type="text"
+                            className="w-full p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                            value={project.link || ''}
+                            onChange={(e) => {
+                              const newProjects = [...projects]
+                              newProjects[index] = { ...newProjects[index], link: e.target.value }
+                              setProjects(newProjects)
+                            }}
+                            placeholder="Project Link"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                      onClick={() => setProjects([...projects, { name: '', description: '', technologies: [], link: '' }])}
+                    >
+                      + Add Project
+                    </button>
+                  </div>
+                </div>
+
+                {/* Languages Section */}
+                <div className="space-y-4">
+                  <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    🌐 Languages
+                  </h2>
+                  <div className="space-y-3">
+                    {languages.map((language, index) => (
+                      <div key={index} className="flex gap-3 p-3 bg-blue-50/50 rounded-xl border border-blue-100">
+                        <input
+                          type="text"
+                          className="flex-1 p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                          value={language}
+                          onChange={(e) => {
+                            const newLanguages = [...languages]
+                            newLanguages[index] = e.target.value
+                            setLanguages(newLanguages)
+                          }}
+                          placeholder={`Language ${index + 1}`}
+                        />
+                        <button
+                          type="button"
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-all duration-200 transform hover:scale-105"
+                          onClick={() => {
+                            const newLanguages = languages.filter((_, i) => i !== index)
+                            setLanguages(newLanguages)
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                      onClick={() => setLanguages([...languages, ''])}
+                    >
+                      + Add Language
+                    </button>
+                  </div>
+                </div>
+
+                {/* Work Experience Section */}
+                <div className="space-y-4">
+                  <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    💼 Work Experience
+                  </h2>
+                  <div className="space-y-4">
+                    {workExperience.map((work, index) => (
+                      <div key={index} className="p-4 bg-green-50/30 rounded-xl border border-green-100">
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="font-semibold text-gray-700">Experience {index + 1}</h3>
+                          <button
+                            type="button"
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-all duration-200 transform hover:scale-105"
+                            onClick={() => {
+                              const newWorkExperience = workExperience.filter((_, i) => i !== index)
+                              setWorkExperience(newWorkExperience)
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <input
+                              type="text"
+                              className="p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                              value={work?.position || ''}
+                              onChange={(e) => {
+                                const newWorkExperience = [...workExperience]
+                                newWorkExperience[index] = { ...newWorkExperience[index], position: e.target.value }
+                                setWorkExperience(newWorkExperience)
+                              }}
+                              placeholder="Position"
+                            />
+                            <input
+                              type="text"
+                              className="p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                              value={work?.company || ''}
+                              onChange={(e) => {
+                                const newWorkExperience = [...workExperience]
+                                newWorkExperience[index] = { ...newWorkExperience[index], company: e.target.value }
+                                setWorkExperience(newWorkExperience)
+                              }}
+                              placeholder="Company"
+                            />
+                            <input
+                              type="text"
+                              className="p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                              value={work?.start_date || ''}
+                              onChange={(e) => {
+                                const newWorkExperience = [...workExperience]
+                                newWorkExperience[index] = { ...newWorkExperience[index], start_date: e.target.value }
+                                setWorkExperience(newWorkExperience)
+                              }}
+                              placeholder="Start Date"
+                            />
+                            <input
+                              type="text"
+                              className="p-3 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 shadow-sm hover:shadow-md"
+                              value={work?.end_date || ''}
+                              onChange={(e) => {
+                                const newWorkExperience = [...workExperience]
+                                newWorkExperience[index] = { ...newWorkExperience[index], end_date: e.target.value }
+                                setWorkExperience(newWorkExperience)
+                              }}
+                              placeholder="End Date"
+                            />
+                          </div>
+                          <textarea
+                            className="w-full p-3 h-20 rounded-lg border border-blue-200 bg-blue-50 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200 resize-none shadow-sm hover:shadow-md"
+                            value={work?.description || ''}
+                            onChange={(e) => {
+                              const newWorkExperience = [...workExperience]
+                              newWorkExperience[index] = { ...newWorkExperience[index], description: e.target.value }
+                              setWorkExperience(newWorkExperience)
+                            }}
+                            placeholder="Job Description"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                      onClick={() => setWorkExperience([...workExperience, { position: '', company: '', start_date: '', end_date: '', description: '' }])}
+                    >
+                      + Add Work Experience
+                    </button>
+                  </div>
+                </div>
+
+                {/* Generate PDF Button */}
+                <div className="pt-6 border-t border-gray-200">
+                  <button 
+                    className={`w-full py-4 px-8 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-[1.02] shadow-xl ${
+                      loading 
+                        ? 'bg-gray-400 cursor-not-allowed text-white' 
+                        : 'bg-green-600 hover:bg-green-700 text-white hover:shadow-2xl'
+                    }`}
+                    onClick={handleGeneratePDF}
+                    disabled={loading}
                   >
-                    ✕
+                    {loading ? (
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Generating PDF...
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-2">
+                        🎨 Generate PDF CV
+                      </div>
+                    )}
                   </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <input
-                    type="text"
-                    className="border p-2 w-full my-1"
-                    value={work?.position || ''}
-                    onChange={(e) => {
-                      const newWorkExperience = [...workExperience]
-                      newWorkExperience[index] = { ...newWorkExperience[index], position: e.target.value }
-                      setWorkExperience(newWorkExperience)
-                    }}
-                    placeholder="Position"
-                  />
-                  <input
-                    type="text"
-                    className="border p-2 w-full my-1"
-                    value={work?.company || ''}
-                    onChange={(e) => {
-                      const newWorkExperience = [...workExperience]
-                      newWorkExperience[index] = { ...newWorkExperience[index], company: e.target.value }
-                      setWorkExperience(newWorkExperience)
-                    }}
-                    placeholder="Company"
-                  />
-                  <input
-                    type="text"
-                    className="border p-2 w-full my-1"
-                    value={work?.start_date || ''}
-                    onChange={(e) => {
-                      const newWorkExperience = [...workExperience]
-                      newWorkExperience[index] = { ...newWorkExperience[index], start_date: e.target.value }
-                      setWorkExperience(newWorkExperience)
-                    }}
-                    placeholder="Start Date"
-                  />
-                  <input
-                    type="text"
-                    className="border p-2 w-full my-1"
-                    value={work?.end_date || ''}
-                    onChange={(e) => {
-                      const newWorkExperience = [...workExperience]
-                      newWorkExperience[index] = { ...newWorkExperience[index], end_date: e.target.value }
-                      setWorkExperience(newWorkExperience)
-                    }}
-                    placeholder="End Date"
-                  />
-                </div>
-                <textarea
-                  className="border p-2 w-full my-1 h-16"
-                  value={work?.description || ''}
-                  onChange={(e) => {
-                    const newWorkExperience = [...workExperience]
-                    newWorkExperience[index] = { ...newWorkExperience[index], description: e.target.value }
-                    setWorkExperience(newWorkExperience)
-                  }}
-                  placeholder="Job Description"
-                />
-              </div>
-            ))}
-            <button
-              type="button"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => setWorkExperience([...workExperience, { position: '', company: '', start_date: '', end_date: '', description: '' }])}
-            >
-              + Add Work Experience
-            </button>
-          </div>
 
-          {/* Save Button */}
-          <div className="mt-8 flex justify-center">
-            <button 
-              className={`text-white px-8 py-3 rounded-lg font-semibold ${loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
-              onClick={handleGeneratePDF}
-              disabled={loading}
-            >
-              {loading ? 'Generating PDF...' : 'Generate PDF CV'}
-            </button>
-          </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
