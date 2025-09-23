@@ -35,7 +35,7 @@ function Page() {
   return (
     <main>
       <nav className='bg-gray-800 text-white p-4'>
-        <h1 className='text-lg font-bold'>CV to Portfolio</h1>
+        <h1 className='text-lg font-bold'>Portfolio to CV</h1>
       </nav>
 
       <div className='flex flex-col items-center justify-center py-4 m-10'>
