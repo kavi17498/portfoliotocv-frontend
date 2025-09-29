@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 
 function Page() {
   const [input, setInput] = useState<string>('')
@@ -138,7 +139,16 @@ function Page() {
       {/* Modern Header */}
       <nav className='bg-blue-600 text-white p-6 shadow-lg'>
         <div className="max-w-7xl mx-auto">
-          <h1 className='text-2xl font-bold tracking-wide'>🚀 Portfolio to CV</h1>
+          <div className="flex items-center gap-4">
+            <Image 
+              src="/logo.png" 
+              alt="Portfolio2CV Logo" 
+              width={40} 
+              height={40} 
+              className="rounded-lg"
+            />
+            <h1 className='text-2xl font-bold tracking-wide'>Portfolio2CV</h1>
+          </div>
         </div>
       </nav>
 
@@ -200,6 +210,15 @@ function Page() {
       {!result?.parsed_data && (
         <div className='flex flex-col items-center justify-center py-16 px-6'>
           <div className="text-center max-w-3xl">
+            <div className="flex justify-center mb-8">
+              <Image 
+                src="/logo.png" 
+                alt="Portfolio2CV Logo" 
+                width={120} 
+                height={120} 
+                className="rounded-2xl shadow-lg"
+              />
+            </div>
             <h1 className='text-5xl lg:text-6xl font-bold text-blue-600 mb-6'>
               Convert Your Portfolio to Professional CV
             </h1>
@@ -214,7 +233,7 @@ function Page() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                Professional Templates
+                Professional Template
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
